@@ -141,7 +141,7 @@ def charParser():
 	global result
 	if inBounds():
 		x = input[currentIndex]
-		if x == "<" or x == ">" or x == "(" or x == ")" or x == "[" or x == "\\" or x == "." or x == "," or x == ";" or x == ":" or x == "@" or x == "\"" or x == " " or x == "\t":
+		if x == "<" or x == ">" or x == "(" or x == ")" or x == "[" or x == "]" or x == "\\" or x == "." or x == "," or x == ";" or x == ":" or x == "@" or x == "\"" or x == " " or x == "\t":
 			return False
 		else:
 			currentIndex+=1

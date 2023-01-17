@@ -162,10 +162,14 @@ def domainParser():
 			result = "ERROR -- element"
 		return False
 def elementParser():
+	global currentIndex
 	if inBounds():
-		if nameParser():
-			return True
-		elif letterParser():
+		if letterParser():
+			currentIndex-=1
+			if nameParser():
+				return True
+			else:
+				letterParser()
 			return True
 		else:
 			return False

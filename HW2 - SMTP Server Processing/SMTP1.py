@@ -2,20 +2,36 @@
 #On my honor, I have not given nor received unauthorized aid on this assignment
 
 import sys
-#input = sys.stdin.readline()
-#sys.stdout.write(input)
 currentIndex = 0
-result = "Sender ok"
+result = "250 OK"
+state = 0
+RCPTList = []
+EmailTextList = []
 
 def inBounds():
 	global input
 	global currentIndex
 	return len(input) > currentIndex
-
+def resetLoop():
+	global currentIndex
+	global result
+	currentIndex = 0
+	result = "250 OK"
+	return True
+def fullReset():
+	global currentIndex
+	global result
+	global RCPTList
+	global EmailTextList
+	currentIndex = 0
+	result = "250 OK"
+	RCPTList = []
+	EmailTextList = []
 def mailFromCmdParser():
 	global currentIndex
 	global input
 	global result
+
 	if inBounds() and input[currentIndex] == "M":
 		currentIndex+=1
 		if inBounds() and input[currentIndex] == "A":
@@ -26,7 +42,7 @@ def mailFromCmdParser():
 					currentIndex+=1
 					if not whitespaceParser():
 						result = "ERROR -- whitespace"
-						return
+						return False
 					if inBounds() and input[currentIndex] == "F":
 						currentIndex+=1
 						if inBounds() and input[currentIndex] == "R":
@@ -41,7 +57,7 @@ def mailFromCmdParser():
 										if not reversePathParser():
 											return False
 										nullspaceParser()
-										if not CRLFParser() and result == "Sender ok":
+										if not CRLFParser() and result == "250 OK":
 											result = "ERROR -- CRLF"
 											return False
 										return True
@@ -61,10 +77,192 @@ def mailFromCmdParser():
 				return False
 		else:
 			return False
-
 	else:
 		return False
+def MAILFROMParser():
+	global currentIndex
+	global input
+	global result
 
+	if inBounds() and input[currentIndex] == "M":
+		currentIndex+=1
+		if inBounds() and input[currentIndex] == "A":
+			currentIndex+=1
+			if inBounds() and input[currentIndex] == "I":
+				currentIndex+=1
+				if inBounds() and input[currentIndex] == "L":
+					currentIndex+=1
+					if not whitespaceParser():
+						result = "ERROR -- whitespace"
+						return False
+					if inBounds() and input[currentIndex] == "F":
+						currentIndex+=1
+						if inBounds() and input[currentIndex] == "R":
+							currentIndex+=1
+							if inBounds() and input[currentIndex] == "O":
+								currentIndex+=1
+								if inBounds() and input[currentIndex] == "M":
+									currentIndex+=1
+									if inBounds() and input[currentIndex] == ":":
+										return True
+									else:
+										return False
+								else:
+									return False
+							else:
+								return False
+						else:
+							return False
+					else:
+						return False
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+def rcptToCmdParser():
+	global currentIndex
+	global input
+	global result
+
+	if inBounds() and input[currentIndex] == "R":
+		currentIndex+=1
+		if inBounds() and input[currentIndex] == "C":
+			currentIndex+=1
+			if inBounds() and input[currentIndex] == "P":
+				currentIndex+=1
+				if inBounds() and input[currentIndex] == "T":
+					currentIndex+=1
+					if not whitespaceParser():
+						result = "ERROR -- whitespace"
+						return False
+					if inBounds() and input[currentIndex] == "T":
+						currentIndex+=1
+						if inBounds() and input[currentIndex] == "O":
+							currentIndex+=1
+							if inBounds() and input[currentIndex] == ":":
+								currentIndex+=1
+								nullspaceParser()
+								if not forwardPathParser():
+									return False
+								nullspaceParser()
+								if not CRLFParser() and result == "250 OK":
+									result = "ERROR -- CRLF"
+									return False
+								return True
+							else:
+								return False
+						else:
+							return False
+					else:
+						return False
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+def RCPTTOParser():
+	global currentIndex
+	global input
+	global result
+
+	if inBounds() and input[currentIndex] == "R":
+		currentIndex+=1
+		if inBounds() and input[currentIndex] == "C":
+			currentIndex+=1
+			if inBounds() and input[currentIndex] == "P":
+				currentIndex+=1
+				if inBounds() and input[currentIndex] == "T":
+					currentIndex+=1
+					if not whitespaceParser():
+						result = "ERROR -- whitespace"
+						return False
+					if inBounds() and input[currentIndex] == "T":
+						currentIndex+=1
+						if inBounds() and input[currentIndex] == "O":
+							currentIndex+=1
+							if inBounds() and input[currentIndex] == ":":
+								return True
+							else:
+								return False
+						else:
+							return False
+					else:
+						return False
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+def dataCmdParser():
+	global currentIndex
+	global input
+	global result
+
+	if inBounds() and input[currentIndex] == "D":
+		currentIndex+=1
+		if inBounds() and input[currentIndex] == "A":
+			currentIndex+=1
+			if inBounds() and input[currentIndex] == "T":
+				currentIndex+=1
+				if inBounds() and input[currentIndex] == "A":
+					currentIndex+=1
+					nullspaceParser()
+					if not CRLFParser() and result == "250 OK":
+						result = "ERROR -- CRLF"
+						return False
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+def DATAParser():
+	global currentIndex
+	global input
+	global result
+
+	if inBounds() and input[currentIndex] == "D":
+		currentIndex+=1
+		if inBounds() and input[currentIndex] == "A":
+			currentIndex+=1
+			if inBounds() and input[currentIndex] == "T":
+				currentIndex+=1
+				if inBounds() and input[currentIndex] == "A":
+					return True
+				else:
+					return False
+			else:
+				return False
+		else:
+			return False
+	else:
+		return False
+def endEmailTextParser():
+	global currentIndex
+	global input
+	global result
+	
+	if inBounds() and input[currentIndex] == ".":
+		currentIndex += 1
+		if inBounds() and CRLFParser():
+			return True
+		currentIndex -= 1
+		return False
+	else:
+		return False
 def whitespaceParser():
 	global currentIndex
 	global input
@@ -83,7 +281,16 @@ def reversePathParser():
 	global input
 	global result
 
-	if not pathParser() and result == "Sender ok":
+	if not pathParser() and result == "250 OK":
+		result = "ERROR -- path"
+		return False
+	else: return True
+def forwardPathParser():
+	global currentIndex
+	global input
+	global result
+
+	if not pathParser() and result == "250 OK":
 		result = "ERROR -- path"
 		return False
 	else: return True
@@ -99,7 +306,7 @@ def pathParser():
 				return True
 			else:
 				return False
-		elif result == "Sender ok":
+		elif result == "250 OK":
 			result = "ERROR -- mailbox"
 		return False
 	else:
@@ -119,7 +326,7 @@ def localPartParser():
 	global currentIndex
 	global input
 	global result
-	if not stringParser() and result == "Sender ok":
+	if not stringParser() and result == "250 OK":
 		result = "ERROR -- string"
 		return False
 	return True
@@ -158,7 +365,7 @@ def domainParser():
 			domainParser()
 		return True
 	else:
-		if result == "Sender ok":
+		if result == "250 OK":
 			result = "ERROR -- element"
 		return False
 def elementParser():
@@ -251,12 +458,130 @@ def CRLFParser():
 		return True
 	else:
 		return False
-
+def spliceString(string: input):
+	startIndex = 0
+	endIndex = 0
+	for x in range(len(input)):
+		if input[x] == "<":
+			startIndex = x+1
+		elif input[x] == ">":
+			endIndex = x
+			break
+	return input[startIndex:endIndex]
+def error500():
+	if not MAILFROMParser():
+		resetLoop()
+		if not RCPTTOParser():
+			resetLoop()
+			if not DATAParser():
+				sys.stdout.write("500 Syntax error: command unrecognized\n")
+				resetLoop()
+				return True
+	resetLoop()
+	return False
+def error503(currentCmd):
+	if currentCmd == "mailFromCmd":
+		if not RCPTTOParser():
+			resetLoop()
+			if not DATAParser():
+				resetLoop()
+				return False
+		resetLoop()
+		sys.stdout.write("503 Bad sequence of commands\n")
+		return True
+	elif currentCmd == "rcptToCmd":
+		if not MAILFROMParser():
+			resetLoop()
+			if not DATAParser():
+				resetLoop()
+				return False
+		resetLoop()
+		sys.stdout.write("503 Bad sequence of commands\n")
+		return True
+	else:
+		if not MAILFROMParser():
+			resetLoop()
+			if not RCPTTOParser():
+				resetLoop()
+				return False
+		resetLoop()
+		sys.stdout.write("503 Bad sequence of commands\n")
+		return True
+	
 for input in sys.stdin:
 	sys.stdout.write(input)
-	if not mailFromCmdParser() and result == "Sender ok":
-		result = "ERROR -- mail-from-cmd"
-	sys.stdout.write(result +"\n")
-	#RESET FOR NEXT LOOP
-	currentIndex = 0
-	result = "Sender ok"
+	if state == 0:
+		if mailFromCmdParser() and result == "250 OK":
+			state = 1
+			sys.stdout.write(result + "\n")
+			EmailTextList.append("From: <" + spliceString(input) + ">\n")
+		else:
+			resetLoop()
+			if not error500():
+				resetLoop()
+				if not error503("mailFromCmd"):
+					sys.stdout.write("501 Syntax error in parameters or arguments\n")
+			fullReset()
+			state = 0
+	elif state == 1:
+		if rcptToCmdParser() and result == "250 OK":
+			state = 2
+			sys.stdout.write(result + "\n")
+			EmailTextList.append("To: <" + spliceString(input) + ">\n")
+			RCPTList.append(spliceString(input))
+		else:
+			resetLoop()
+			if not error500():
+				resetLoop()
+				if not error503("rcptToCmd"):
+					sys.stdout.write("501 Syntax error in parameters or arguments\n")
+			fullReset()
+			state = 0
+	elif state == 2:
+		if dataCmdParser():
+			sys.stdout.write("354 Start mail input; end with <CLRF>.<CLRF>\n")
+			state = 3
+		elif resetLoop() and rcptToCmdParser() and result == "250 OK":
+			sys.stdout.write(result + "\n")
+			EmailTextList.append("To: <" + spliceString(input) + ">\n")
+			RCPTList.append(spliceString(input))
+		else:
+			resetLoop()
+			if not error500():
+				resetLoop()
+				if MAILFROMParser():
+					sys.stdout.write("503 Bad sequence of commands\n")
+				else:
+					sys.stdout.write("501 Syntax error in parameters or arguments\n")
+			fullReset()
+			state = 0
+	elif state == 3:
+		if not endEmailTextParser():
+			EmailTextList.append(input)
+		else:
+			for x in range(len(RCPTList)):
+				#open up file to append to
+#				print("opened " + "forward/" + RCPTList[x])
+				file = open("./forward/" + RCPTList[x], "a")
+				#write to file
+				for y in range(len(EmailTextList)):
+#					print(EmailTextList[y])
+					file.write(EmailTextList[y])
+				file.close()
+			fullReset()
+			state = 0
+			sys.stdout.write("250 OK\n")
+				#close file
+	resetLoop()
+
+			#write to file
+			#Create a new string to represent the text.
+			#add "From: <reverse-path>"
+#		resetLoop()
+#for input in sys.stdin:
+#	sys.stdout.write(input)
+#	if not dataCmdParser() and result == "250 OK":
+#		result = "ERROR -- mail-from-cmd"
+#	sys.stdout.write(result +"\n")
+#	#RESET FOR NEXT LOOP
+#	resetLoop()

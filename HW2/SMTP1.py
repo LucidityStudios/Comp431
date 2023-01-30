@@ -1,12 +1,14 @@
 #Lucy Amaranto
 #On my honor, I have not given nor received unauthorized aid on this assignment
 
+import os
 import sys
 currentIndex = 0
 result = "250 OK"
 state = 0
 RCPTList = []
 EmailTextList = []
+inData = False
 
 def inBounds():
 	global input
@@ -23,10 +25,13 @@ def fullReset():
 	global result
 	global RCPTList
 	global EmailTextList
+	global inData
+	inData = False
 	currentIndex = 0
 	result = "250 OK"
 	RCPTList = []
 	EmailTextList = []
+
 def mailFromCmdParser():
 	global currentIndex
 	global input
@@ -540,6 +545,7 @@ for input in sys.stdin:
 	elif state == 2:
 		if dataCmdParser():
 			sys.stdout.write("354 Start mail input; end with <CLRF>.<CLRF>\n")
+			inData = True
 			state = 3
 		elif resetLoop() and rcptToCmdParser() and result == "250 OK":
 			sys.stdout.write(result + "\n")
@@ -562,7 +568,9 @@ for input in sys.stdin:
 			for x in range(len(RCPTList)):
 				#open up file to append to
 #				print("opened " + "forward/" + RCPTList[x])
-				file = open("./forward/" + RCPTList[x], "a")
+				home_dir = os.path.dirname(os.path.abspath(__file__))
+				home_dir = os.path.join(home_dir, "forward/")
+				file = open(home_dir + RCPTList[x], "a")
 				#write to file
 				for y in range(len(EmailTextList)):
 #					print(EmailTextList[y])
@@ -573,15 +581,5 @@ for input in sys.stdin:
 			sys.stdout.write("250 OK\n")
 				#close file
 	resetLoop()
-
-			#write to file
-			#Create a new string to represent the text.
-			#add "From: <reverse-path>"
-#		resetLoop()
-#for input in sys.stdin:
-#	sys.stdout.write(input)
-#	if not dataCmdParser() and result == "250 OK":
-#		result = "ERROR -- mail-from-cmd"
-#	sys.stdout.write(result +"\n")
-#	#RESET FOR NEXT LOOP
-#	resetLoop()
+if inData:
+	sys.stdout.write("\n501 Syntax error in parameters or arguments\n")

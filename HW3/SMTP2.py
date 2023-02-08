@@ -47,6 +47,7 @@ def responseCodeParser(currentCmd):
 		return False
 
 moreThanOne = False
+
 if len(sys.argv) <= 1 or not os.path.isfile(str(sys.argv[1])):
 	exit()
 file = open(str(sys.argv[1]), "r")
@@ -111,8 +112,6 @@ if state == 1:
 		exit()
 	sys.stdout.write(".\n")
 if state == 2:
-	if moreThanOne:
-		sys.stdout.write("\n")
 	sys.stdout.write(".\n")
 
 input = sys.stdin.readline()
